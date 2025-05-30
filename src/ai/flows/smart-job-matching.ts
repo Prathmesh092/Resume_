@@ -1,4 +1,4 @@
-// use server'
+'use server';
 
 /**
  * @fileOverview Implements the smart job matching flow using AI.

@@ -25,6 +25,17 @@ const nextConfig: NextConfig = {
         ...config.resolve.alias,
         'async_hooks': false,
       };
+      // Additionally, ignore problematic Node-specific OpenTelemetry packages on the client
+      config.plugins.push(
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^@opentelemetry\/sdk-trace-node$/,
+        })
+      );
+      config.plugins.push(
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^@opentelemetry\/context-async-hooks$/,
+        })
+      );
     }
 
     // Workaround for https://github.com/firebase/genkit/issues/1171
