@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -62,14 +63,20 @@ export default function DashboardPage() {
         {parsedResume && !isProcessingInitial && !processingError && (
           <>
             <Separator />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              <div className="lg:col-span-1">
+            {/* Section for Resume Summary View */}
+            <div className="space-y-6 py-8">
+              <h2 className="text-3xl font-bold tracking-tight text-center">
+                Your Resume Summary
+              </h2>
+              <div className="max-w-4xl mx-auto">
                 <ResumeInsightsCard resumeData={parsedResume} />
               </div>
-              <div className="lg:col-span-2">
-                <JobListings parsedResumeData={parsedResume} triggerSearch={jobSearchTrigger} />
-              </div>
             </div>
+
+            <Separator className="my-8" /> {/* Adjusted margin for visual separation */}
+            
+            {/* Job Listings section - JobListings component already has its own title */}
+            <JobListings parsedResumeData={parsedResume} triggerSearch={jobSearchTrigger} />
           </>
         )}
       </div>
