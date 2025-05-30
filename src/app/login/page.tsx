@@ -19,9 +19,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { AppLayout } from "@/components/layout/app-layout";
-import { LogIn } from "lucide-react";
+import { LogIn, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const MOCK_AUTH_TOKEN_KEY = 'jobmatcher_mock_auth_token';
+const MOCK_EMAIL = "test@example.com";
+const MOCK_PASSWORD = "password123";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -33,6 +36,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -42,20 +47,28 @@ export default function LoginPage() {
   });
 
   const onSubmit = (data: LoginFormValues) => {
-    // Simulate API call & successful login
-    console.log("Login data:", data);
-    // In a real app, you would verify credentials with a backend.
-    // For this prototype, we'll just set a mock token.
-    localStorage.setItem(MOCK_AUTH_TOKEN_KEY, "mock_user_token_logged_in");
-    
-    toast({
-      title: "Login Successful",
-      description: "Welcome back!",
-      variant: "default",
-      className: "bg-accent text-accent-foreground"
-    });
-    router.push("/"); // Redirect to dashboard or home
-    router.refresh(); // Important to re-render header with new auth state
+    // Simulate API call & credential check
+    if (data.email === MOCK_EMAIL && data.password === MOCK_PASSWORD) {
+      localStorage.setItem(MOCK_AUTH_TOKEN_KEY, "mock_user_token_logged_in");
+      
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+        variant: "default",
+        className: "bg-accent text-accent-foreground"
+      });
+      router.push("/"); 
+      router.refresh(); 
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Incorrect email or password. Please try again.",
+        variant: "destructive",
+      });
+      // Optionally, you could use form.setError here, but a toast is often better for general auth errors.
+      // form.setError("email", { type: "manual", message: "Incorrect email or password." });
+      // form.setError("password", { type: "manual", message: "" }); // Clear if you set one on email
+    }
   };
 
   return (
@@ -91,9 +104,26 @@ export default function LoginPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
+                      <div className="relative">
+                        <FormControl>
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="••••••••" 
+                            {...field} 
+                            className="pr-10"
+                          />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute inset-y-0 right-0 flex items-center justify-center h-full w-10 text-muted-foreground hover:text-foreground"
+                          onClick={() => setShowPassword(!showPassword)}
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </Button>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
