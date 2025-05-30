@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
     // These modules are not always correctly excluded by Next.js/Webpack for server components.
     config.plugins.push(
       new webpack.IgnorePlugin({
-        resourceRegExp: /^(?:@google-cloud\/functions-framework|@opentelemetry\/sdk-trace-base)$/,
+        resourceRegExp: /^@google-cloud\/functions-framework$/,
       })
     );
 
