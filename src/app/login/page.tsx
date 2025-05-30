@@ -61,13 +61,10 @@ export default function LoginPage() {
       router.refresh(); 
     } else {
       toast({
-        title: "Login Failed",
-        description: "Incorrect email or password. Please try again.",
+        title: "Incorrect email or password",
+        description: "Please check your credentials and try again.",
         variant: "destructive",
       });
-      // Optionally, you could use form.setError here, but a toast is often better for general auth errors.
-      // form.setError("email", { type: "manual", message: "Incorrect email or password." });
-      // form.setError("password", { type: "manual", message: "" }); // Clear if you set one on email
     }
   };
 
