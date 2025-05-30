@@ -18,6 +18,27 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer, webpack }) => {
+    if (!isServer) {
+      // Prevent 'async_hooks' from being bundled in the client
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'async_hooks': false,
+      };
+    }
+
+    // Workaround for https://github.com/firebase/genkit/issues/1171
+    // and possibly related to https://github.com/GoogleCloudPlatform/functions-framework-nodejs/issues/639
+    // These modules are not always correctly excluded by Next.js/Webpack for server components.
+    config.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^(?:@google-cloud\/functions-framework|@opentelemetry\/sdk-trace-base)$/,
+      })
+    );
+
+
+    return config;
+  },
 };
 
 export default nextConfig;
