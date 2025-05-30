@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Briefcase, LogIn, LogOut, UserPlus, Home, Upload, ListChecks } from 'lucide-react';
+import { Briefcase, LogIn, LogOut, UserPlus, Home, Upload, ListChecks, Bookmark } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
@@ -23,6 +23,7 @@ export function Header() {
   const handleLogout = () => {
     localStorage.removeItem(MOCK_AUTH_TOKEN_KEY);
     localStorage.removeItem('jobmatcher_parsed_resume'); // Clear resume data on logout
+    localStorage.removeItem('jobmatcher_saved_jobs'); // Clear saved jobs on logout
     setIsLoggedIn(false);
     router.push('/'); 
     router.refresh(); 
@@ -32,6 +33,7 @@ export function Header() {
     { href: '/', label: 'Dashboard', icon: Home },
     { href: '/upload', label: 'Upload Resume', icon: Upload },
     { href: '/matches', label: 'My Matches', icon: ListChecks },
+    { href: '/saved-jobs', label: 'Saved Jobs', icon: Bookmark },
   ];
 
   return (
@@ -91,7 +93,7 @@ export function Header() {
           )}
         </div>
       </div>
-      {/* Mobile Nav - Simple version for now */}
+      {/* Mobile Nav */}
       {isLoggedIn && (
         <nav className="md:hidden flex justify-around p-2 border-t">
             {navItems.map((item) => (
@@ -100,7 +102,7 @@ export function Header() {
                 variant="ghost"
                 asChild
                 className={cn(
-                  "flex-col h-auto p-1",
+                  "flex-col h-auto p-1 text-xs w-1/4", // Adjusted for 4 items
                   pathname === item.href
                     ? "text-primary"
                     : "text-muted-foreground"
@@ -108,7 +110,7 @@ export function Header() {
               >
                 <Link href={item.href} className="flex flex-col items-center">
                   <item.icon className="h-5 w-5 mb-0.5" />
-                  <span className="text-xs">{item.label}</span>
+                  <span className="text-center leading-tight">{item.label}</span>
                 </Link>
               </Button>
             ))}

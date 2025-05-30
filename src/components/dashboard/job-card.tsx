@@ -1,16 +1,73 @@
+
+"use client";
+
 import type { MatchedJob } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Briefcase, MapPin, ExternalLink, Sparkles, Info } from 'lucide-react';
+import { Briefcase, MapPin, ExternalLink, Sparkles, Info, Bookmark, BookmarkCheck } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 interface JobCardProps {
   job: MatchedJob;
 }
 
+const SAVED_JOBS_LOCAL_STORAGE_KEY = 'jobmatcher_saved_jobs';
+
 export function JobCard({ job }: JobCardProps) {
+  const [isSaved, setIsSaved] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    try {
+        const savedJobsString = localStorage.getItem(SAVED_JOBS_LOCAL_STORAGE_KEY);
+        if (savedJobsString) {
+        const savedJobIds: string[] = JSON.parse(savedJobsString);
+        setIsSaved(savedJobIds.includes(job.id));
+        }
+    } catch (error) {
+        console.error("Error reading saved jobs from localStorage:", error);
+        // Silently fail, or show a generic error toast if critical
+    }
+  }, [job.id]);
+
+  const handleSaveToggle = () => {
+    try {
+        const savedJobsString = localStorage.getItem(SAVED_JOBS_LOCAL_STORAGE_KEY);
+        let savedJobIds: string[] = savedJobsString ? JSON.parse(savedJobsString) : [];
+
+        if (isSaved) {
+        // Unsave: Remove job ID
+        savedJobIds = savedJobIds.filter(id => id !== job.id);
+        toast({
+            title: "Job Unsaved",
+            description: `"${job.title}" removed from your saved jobs.`,
+        });
+        } else {
+        // Save: Add job ID
+        savedJobIds.push(job.id);
+        toast({
+            title: "Job Saved!",
+            description: `"${job.title}" added to your saved jobs.`,
+            variant: 'default',
+            className: "bg-accent text-accent-foreground"
+        });
+        }
+        localStorage.setItem(SAVED_JOBS_LOCAL_STORAGE_KEY, JSON.stringify(savedJobIds));
+        setIsSaved(!isSaved);
+    } catch (error) {
+        console.error("Error updating saved jobs in localStorage:", error);
+        toast({
+            title: "Error",
+            description: "Could not update saved jobs. Please try again.",
+            variant: "destructive",
+        });
+    }
+  };
+
   const matchColor = job.matchScore >= 75 ? 'bg-accent' : job.matchScore >= 50 ? 'bg-yellow-400' : 'bg-red-400';
   const matchTextColor = job.matchScore >= 75 ? 'text-accent-foreground' : 'text-white';
 
@@ -53,8 +110,9 @@ export function JobCard({ job }: JobCardProps) {
         </div>
       </CardContent>
       <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-4 border-t">
-        <Button variant="outline" size="sm" className="w-full sm:w-auto" >
-          Save Job
+        <Button variant={isSaved ? "secondary" : "outline"} size="sm" className="w-full sm:w-auto" onClick={handleSaveToggle}>
+          {isSaved ? <BookmarkCheck className="w-4 h-4 mr-2" /> : <Bookmark className="w-4 h-4 mr-2" />}
+          {isSaved ? 'Saved' : 'Save Job'}
         </Button>
         <Button asChild size="sm" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">
           <Link href={linkedInSearchUrl} target="_blank" rel="noopener noreferrer">
