@@ -1,30 +1,38 @@
 
 "use client";
 
-import { Briefcase, LogIn, LogOut, UserPlus } from 'lucide-react';
+import { Briefcase, LogIn, LogOut, UserPlus, Home, Upload, ListChecks } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const MOCK_AUTH_TOKEN_KEY = 'jobmatcher_mock_auth_token';
 
 export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    // Check localStorage on mount (client-side only)
     const token = localStorage.getItem(MOCK_AUTH_TOKEN_KEY);
     setIsLoggedIn(!!token);
-  }, []);
+  }, [pathname]); // Re-check on pathname change for SPA behavior
 
   const handleLogout = () => {
     localStorage.removeItem(MOCK_AUTH_TOKEN_KEY);
+    localStorage.removeItem('jobmatcher_parsed_resume'); // Clear resume data on logout
     setIsLoggedIn(false);
-    router.push('/'); // Redirect to home page after logout
-    router.refresh(); // Refresh server components if needed
+    router.push('/'); 
+    router.refresh(); 
   };
+
+  const navItems = [
+    { href: '/', label: 'Dashboard', icon: Home },
+    { href: '/upload', label: 'Upload Resume', icon: Upload },
+    { href: '/matches', label: 'My Matches', icon: ListChecks },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -35,6 +43,30 @@ export function Header() {
             JobMatcher AI
           </span>
         </Link>
+
+        {isLoggedIn && (
+          <nav className="ml-6 hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
+              <Button
+                key={item.label}
+                variant="ghost"
+                asChild
+                className={cn(
+                  "text-sm font-medium",
+                  pathname === item.href
+                    ? "text-primary bg-accent"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Link href={item.href}>
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </Link>
+              </Button>
+            ))}
+          </nav>
+        )}
+
         <div className="ml-auto flex items-center space-x-2">
           {isLoggedIn ? (
             <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -59,6 +91,29 @@ export function Header() {
           )}
         </div>
       </div>
+      {/* Mobile Nav - Simple version for now */}
+      {isLoggedIn && (
+        <nav className="md:hidden flex justify-around p-2 border-t">
+            {navItems.map((item) => (
+              <Button
+                key={item.label}
+                variant="ghost"
+                asChild
+                className={cn(
+                  "flex-col h-auto p-1",
+                  pathname === item.href
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                )}
+              >
+                <Link href={item.href} className="flex flex-col items-center">
+                  <item.icon className="h-5 w-5 mb-0.5" />
+                  <span className="text-xs">{item.label}</span>
+                </Link>
+              </Button>
+            ))}
+        </nav>
+      )}
     </header>
   );
 }

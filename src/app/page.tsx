@@ -1,46 +1,30 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { ResumeUploadForm } from '@/components/dashboard/resume-upload-form';
-import { ResumeInsightsCard } from '@/components/dashboard/resume-insights-card';
-import { JobListings } from '@/components/dashboard/job-listings';
-import type { ParsedResume } from '@/types';
-import { Separator } from '@/components/ui/separator';
-import { Loader2, ScanText, Briefcase } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Briefcase, Upload, ListChecks, ArrowRight } from 'lucide-react';
 
+const PARSED_RESUME_LOCAL_STORAGE_KEY = 'jobmatcher_parsed_resume';
 
-export default function DashboardPage() {
-  const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
-  const [isProcessingInitial, setIsProcessingInitial] = useState(false);
-  const [processingError, setProcessingError] = useState<string | null>(null);
-  const [jobSearchTrigger, setJobSearchTrigger] = useState(0);
+export default function DashboardHomePage() {
+  const [hasProcessedResume, setHasProcessedResume] = useState(false);
 
-  const handleParsingStart = () => {
-    setIsProcessingInitial(true);
-    setProcessingError(null);
-    setParsedResume(null); // Clear previous results
-  };
-
-  const handleParsingComplete = (data: ParsedResume) => {
-    setParsedResume(data);
-    setIsProcessingInitial(false);
-    setJobSearchTrigger(prev => prev + 1); // Trigger job search/matching
-  };
-  
-  const handleParsingError = (errorMsg: string) => {
-    setIsProcessingInitial(false);
-    setProcessingError(errorMsg);
-  };
+  useEffect(() => {
+    // Check if resume data exists in localStorage
+    const storedResume = localStorage.getItem(PARSED_RESUME_LOCAL_STORAGE_KEY);
+    setHasProcessedResume(!!storedResume);
+  }, []);
 
   return (
     <AppLayout>
       <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-12">
         <section className="text-center py-10 sm:py-16 bg-card shadow-xl rounded-xl border">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary animate-pulse">
-              <Briefcase className="h-10 w-10" />
+            <Briefcase className="h-10 w-10" />
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight text-primary sm:text-5xl md:text-6xl">
             Welcome to JobMatcher AI
@@ -50,47 +34,72 @@ export default function DashboardPage() {
           </p>
         </section>
 
-        <ResumeUploadForm 
-          onParsingStart={handleParsingStart}
-          onParsingComplete={handleParsingComplete}
-          onParsingError={handleParsingError}
-        />
-
-        {isProcessingInitial && (
-          <div className="flex flex-col items-center justify-center text-center p-10 border border-dashed rounded-lg bg-card">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-            <p className="text-lg font-semibold text-foreground">Analyzing your resume...</p>
-            <p className="text-muted-foreground">This might take a few moments. We're working hard to find you the best opportunities!</p>
-          </div>
-        )}
-
-        {processingError && !isProcessingInitial && (
-           <Alert variant="destructive">
-            <ScanText className="h-4 w-4" />
-            <AlertTitle>Resume Processing Failed</AlertTitle>
-            <AlertDescription>{processingError}</AlertDescription>
-          </Alert>
-        )}
-
-        {parsedResume && !isProcessingInitial && !processingError && (
-          <>
-            <Separator />
-            {/* Section for Resume Summary View */}
-            <div className="space-y-6 py-8">
-              <h2 className="text-3xl font-bold tracking-tight text-center">
-                Your Resume Summary
-              </h2>
-              <div className="max-w-4xl mx-auto">
-                <ResumeInsightsCard resumeData={parsedResume} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+            <CardHeader>
+              <div className="flex items-center mb-3">
+                <Upload className="h-8 w-8 text-primary mr-3" />
+                <CardTitle className="text-2xl">Upload Your Resume</CardTitle>
               </div>
-            </div>
+              <CardDescription>
+                Get started by uploading your resume. Our AI will parse it to extract key information and help you find relevant job opportunities.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow flex items-end">
+              <Button asChild className="w-full mt-4" size="lg">
+                <Link href="/upload">
+                  Upload Resume <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
 
-            <Separator className="my-8" /> {/* Adjusted margin for visual separation */}
-            
-            {/* Job Listings section - JobListings component already has its own title */}
-            <JobListings parsedResumeData={parsedResume} triggerSearch={jobSearchTrigger} />
-          </>
-        )}
+          <Card className={`shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col ${!hasProcessedResume ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <CardHeader>
+               <div className="flex items-center mb-3">
+                <ListChecks className="h-8 w-8 text-primary mr-3" />
+                <CardTitle className="text-2xl">View Job Matches</CardTitle>
+              </div>
+              <CardDescription>
+                {hasProcessedResume 
+                  ? "See the job roles that best match your skills and experience based on your uploaded resume."
+                  : "Upload your resume first to see personalized job matches."
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow flex items-end">
+              <Button asChild className="w-full mt-4" size="lg" disabled={!hasProcessedResume}>
+                <Link href="/matches">
+                  View My Matches <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Placeholder for future dashboard elements if any */}
+        {/* 
+        <Separator className="my-12" />
+        <section>
+          <h2 className="text-3xl font-bold tracking-tight text-center mb-8">
+            Your Activity At a Glance
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader><CardTitle>Applications Sent</CardTitle></CardHeader>
+              <CardContent><p className="text-4xl font-bold">0</p></CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>Saved Jobs</CardTitle></CardHeader>
+              <CardContent><p className="text-4xl font-bold">0</p></CardContent>
+            </Card>
+             <Card>
+              <CardHeader><CardTitle>Profile Views</CardTitle></CardHeader>
+              <CardContent><p className="text-4xl font-bold">0</p></CardContent>
+            </Card>
+          </div>
+        </section> 
+        */}
       </div>
     </AppLayout>
   );
