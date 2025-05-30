@@ -14,6 +14,8 @@ export function JobCard({ job }: JobCardProps) {
   const matchColor = job.matchScore >= 75 ? 'bg-accent' : job.matchScore >= 50 ? 'bg-yellow-400' : 'bg-red-400';
   const matchTextColor = job.matchScore >= 75 ? 'text-accent-foreground' : 'text-white';
 
+  const linkedInSearchUrl = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title + " " + job.company)}`;
+
   return (
     <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <CardHeader>
@@ -55,8 +57,8 @@ export function JobCard({ job }: JobCardProps) {
           Save Job
         </Button>
         <Button asChild size="sm" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">
-          <Link href={job.url} target="_blank" rel="noopener noreferrer">
-            Apply Now
+          <Link href={linkedInSearchUrl} target="_blank" rel="noopener noreferrer">
+            Apply on LinkedIn
             <ExternalLink className="w-4 h-4 ml-2" />
           </Link>
         </Button>
