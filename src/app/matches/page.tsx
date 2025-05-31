@@ -3,45 +3,76 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import { AppLayout } from '@/components/layout/app-layout';
 import { ResumeInsightsCard } from '@/components/dashboard/resume-insights-card';
 import { JobListings } from '@/components/dashboard/job-listings';
 import type { ParsedResume } from '@/types';
 import { Separator } from '@/components/ui/separator';
-import { AlertCircle, FileText, SearchX } from 'lucide-react';
+import { AlertCircle, FileText, SearchX, UserCog } from 'lucide-react'; // Added UserCog
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PARSED_RESUME_LOCAL_STORAGE_KEY } from '@/lib/constants';
+import { getUserResume } from '@/actions/resume';
+import { JOBMATCHER_USER_ID_KEY } from '@/lib/constants';
 
 export default function JobMatchesPage() {
   const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
   const [isLoadingResume, setIsLoadingResume] = useState(true);
   const [jobSearchTrigger, setJobSearchTrigger] = useState(0);
   const [errorLoadingResume, setErrorLoadingResume] = useState<string | null>(null);
+  const router = useRouter(); // Initialize useRouter
 
 
   useEffect(() => {
-    try {
-      const storedResume = localStorage.getItem(PARSED_RESUME_LOCAL_STORAGE_KEY);
-      if (storedResume) {
-        const resumeData = JSON.parse(storedResume) as ParsedResume;
-        if (resumeData && Array.isArray(resumeData.skills) && Array.isArray(resumeData.experience) && Array.isArray(resumeData.education)) {
-            setParsedResume(resumeData);
-            setJobSearchTrigger(prev => prev + 1); 
-        } else {
-            console.warn("Invalid resume data structure in localStorage.");
-            setErrorLoadingResume("The stored resume data is not in the expected format. Please try uploading again.");
-            localStorage.removeItem(PARSED_RESUME_LOCAL_STORAGE_KEY); 
-        }
+    const loadResume = async () => {
+      setIsLoadingResume(true);
+      setErrorLoadingResume(null);
+      const userId = localStorage.getItem(JOBMATCHER_USER_ID_KEY);
+
+      if (!userId) {
+        setErrorLoadingResume("User not identified. Please log in to view your matches or upload a resume.");
+        setIsLoadingResume(false);
+        // Optional: Redirect to login after a short delay or with a button
+        // setTimeout(() => router.push('/login'), 3000); 
+        return;
       }
-    } catch (error) {
-      console.error("Error loading or parsing resume from localStorage:", error);
-      setErrorLoadingResume("Could not load your resume data. It might be corrupted or an unexpected error occurred.");
-    } finally {
-      setIsLoadingResume(false);
-    }
-  }, []);
+
+      try {
+        const result = await getUserResume(userId);
+
+        if (result.success) {
+          if (result.resume) {
+            // Basic validation of resume structure
+            if (result.resume && Array.isArray(result.resume.skills) && Array.isArray(result.resume.experience) && Array.isArray(result.resume.education)) {
+                setParsedResume(result.resume);
+                setJobSearchTrigger(prev => prev + 1); 
+            } else {
+                console.warn("Invalid resume data structure from DB.");
+                setErrorLoadingResume("The resume data from the server is not in the expected format. Try uploading again.");
+                setParsedResume(null);
+            }
+          } else {
+            // No resume found for the user is a valid state, not an error state for loading.
+            setParsedResume(null); 
+          }
+        } else {
+          console.error("Error fetching resume from DB:", result.message);
+          setErrorLoadingResume(result.message || "Could not load your resume data from the server.");
+          setParsedResume(null);
+        }
+      } catch (error) {
+        console.error("Error in loadResume effect:", error);
+        setErrorLoadingResume("An unexpected error occurred while trying to load your resume data.");
+        setParsedResume(null);
+      } finally {
+        setIsLoadingResume(false);
+      }
+    };
+
+    loadResume();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
 
   if (isLoadingResume) {
     return (
@@ -71,6 +102,26 @@ export default function JobMatchesPage() {
   }
   
   if (errorLoadingResume) {
+     // Specific message if user is not identified
+     if (errorLoadingResume.includes("User not identified")) {
+        return (
+            <AppLayout>
+                <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center">
+                <Alert variant="destructive" className="w-full max-w-lg">
+                    <UserCog className="h-5 w-5" />
+                    <AlertTitle>Authentication Required</AlertTitle>
+                    <AlertDescription>
+                    {errorLoadingResume}
+                    <Button asChild variant="link" className="mt-2">
+                        <Link href="/login">Go to Login</Link>
+                    </Button>
+                    </AlertDescription>
+                </Alert>
+                </div>
+            </AppLayout>
+        );
+     }
+     // General error message for other cases
      return (
       <AppLayout>
         <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center">
@@ -80,7 +131,7 @@ export default function JobMatchesPage() {
             <AlertDescription>
               {errorLoadingResume}
               <Button asChild variant="link" className="mt-2">
-                <Link href="/upload">Upload Resume Again</Link>
+                <Link href="/upload">Try Uploading Again</Link>
               </Button>
             </AlertDescription>
           </Alert>
@@ -89,15 +140,15 @@ export default function JobMatchesPage() {
     );
   }
 
-  if (!parsedResume) {
+  if (!parsedResume) { // This means loading is finished, no error, but no resume data
     return (
       <AppLayout>
         <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center">
           <div className="p-8 border border-dashed rounded-lg bg-card max-w-lg">
             <SearchX className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
-            <h2 className="text-2xl font-semibold text-foreground mb-3">No Resume Data Found</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-3">No Resume Found</h2>
             <p className="text-muted-foreground mb-6">
-              It looks like you haven't uploaded a resume yet, or the data couldn't be loaded. 
+              It looks like you haven't uploaded a resume to your profile yet. 
               Please upload your resume to see personalized job matches.
             </p>
             <Button asChild size="lg">
@@ -130,3 +181,4 @@ export default function JobMatchesPage() {
     </AppLayout>
   );
 }
+

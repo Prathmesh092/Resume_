@@ -9,7 +9,8 @@ import type { ParsedResume } from '@/types';
 import { Loader2, ScanText, FileUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PARSED_RESUME_LOCAL_STORAGE_KEY } from '@/lib/constants';
+import { saveUserResume } from '@/actions/resume';
+import { JOBMATCHER_USER_ID_KEY } from '@/lib/constants';
 
 export default function UploadResumePage() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -21,14 +22,29 @@ export default function UploadResumePage() {
     setProcessingError(null);
   };
 
-  const handleParsingComplete = (data: ParsedResume) => {
-    try {
-      localStorage.setItem(PARSED_RESUME_LOCAL_STORAGE_KEY, JSON.stringify(data));
+  const handleParsingComplete = async (data: ParsedResume) => {
+    const userId = localStorage.getItem(JOBMATCHER_USER_ID_KEY);
+    if (!userId) {
+      setProcessingError("User not identified. Please log in again to save your resume.");
       setIsProcessing(false);
-      router.push('/matches'); 
+      // Consider redirecting to login or showing a more prominent error.
+      // router.push('/login'); 
+      return;
+    }
+
+    try {
+      const saveResult = await saveUserResume(userId, data);
+      if (saveResult.success) {
+        setIsProcessing(false);
+        router.push('/matches'); 
+      } else {
+        console.error("Error storing resume data in DB:", saveResult.message);
+        setProcessingError(saveResult.message || "Could not save resume data to the server. Please try again.");
+        setIsProcessing(false);
+      }
     } catch (error) {
-      console.error("Error storing resume data in localStorage:", error);
-      setProcessingError("Could not save resume data. Please try again.");
+      console.error("Error calling saveUserResume:", error);
+      setProcessingError("An unexpected error occurred while saving your resume. Please try again.");
       setIsProcessing(false);
     }
   };
@@ -63,14 +79,14 @@ export default function UploadResumePage() {
                 <div className="mt-6 flex flex-col items-center justify-center text-center p-6 border border-dashed rounded-lg bg-card">
                     <Loader2 className="h-10 w-10 animate-spin text-primary mb-3" />
                     <p className="text-md font-semibold text-foreground">Analyzing your resume...</p>
-                    <p className="text-sm text-muted-foreground">This might take a few moments.</p>
+                    <p className="text-sm text-muted-foreground">This might take a few moments. Saving to your profile.</p>
                 </div>
                 )}
 
                 {processingError && !isProcessing && (
                 <Alert variant="destructive" className="mt-6">
                     <ScanText className="h-4 w-4" />
-                    <AlertTitle>Resume Processing Failed</AlertTitle>
+                    <AlertTitle>Resume Processing or Saving Failed</AlertTitle>
                     <AlertDescription>{processingError}</AlertDescription>
                 </Alert>
                 )}

@@ -1,21 +1,22 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, Upload, ListChecks, ArrowRight } from 'lucide-react';
-import { PARSED_RESUME_LOCAL_STORAGE_KEY } from '@/lib/constants';
+// PARSED_RESUME_LOCAL_STORAGE_KEY is no longer needed here
+// import { PARSED_RESUME_LOCAL_STORAGE_KEY } from '@/lib/constants';
+// useState and useEffect for hasProcessedResume are no longer needed
 
 export default function DashboardHomePage() {
-  const [hasProcessedResume, setHasProcessedResume] = useState(false);
+  // const [hasProcessedResume, setHasProcessedResume] = useState(false); // Removed
 
-  useEffect(() => {
-    const storedResume = localStorage.getItem(PARSED_RESUME_LOCAL_STORAGE_KEY);
-    setHasProcessedResume(!!storedResume);
-  }, []);
+  // useEffect(() => { // Removed
+  //   const storedResume = localStorage.getItem(PARSED_RESUME_LOCAL_STORAGE_KEY);
+  //   setHasProcessedResume(!!storedResume);
+  // }, []);
 
   return (
     <AppLayout>
@@ -40,7 +41,7 @@ export default function DashboardHomePage() {
                 <CardTitle className="text-2xl">Upload Your Resume</CardTitle>
               </div>
               <CardDescription>
-                Get started by uploading your resume. Our AI will parse it to extract key information and help you find relevant job opportunities.
+                Get started by uploading your resume. Our AI will parse it, save it to your profile, and help you find relevant job opportunities.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-grow flex items-end">
@@ -52,21 +53,18 @@ export default function DashboardHomePage() {
             </CardContent>
           </Card>
 
-          <Card className={`shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col ${!hasProcessedResume ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
             <CardHeader>
                <div className="flex items-center mb-3">
                 <ListChecks className="h-8 w-8 text-primary mr-3" />
                 <CardTitle className="text-2xl">View Job Matches</CardTitle>
               </div>
               <CardDescription>
-                {hasProcessedResume 
-                  ? "See the job roles that best match your skills and experience based on your uploaded resume."
-                  : "Upload your resume first to see personalized job matches."
-                }
+                See the job roles that best match your skills and experience. If you haven't uploaded a resume yet, you'll be guided to do so.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-grow flex items-end">
-              <Button asChild className="w-full mt-4" size="lg" disabled={!hasProcessedResume}>
+              <Button asChild className="w-full mt-4" size="lg">
                 <Link href="/matches">
                   View My Matches <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
