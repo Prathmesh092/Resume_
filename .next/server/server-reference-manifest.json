@@ -1,0 +1,92 @@
+{
+  "node": {
+    "404df39bd36ee279cdcaa2ed919f1c4268475ea5a8": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fauth.ts%22%2C%5B%7B%22id%22%3A%22404df39bd36ee279cdcaa2ed919f1c4268475ea5a8%22%2C%22exportedName%22%3A%22loginUser%22%7D%2C%7B%22id%22%3A%2240d1ba13b5b4045b2963cad53b2e5ccab21908e4b2%22%2C%22exportedName%22%3A%22registerUser%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        },
+        "app/register/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fauth.ts%22%2C%5B%7B%22id%22%3A%22404df39bd36ee279cdcaa2ed919f1c4268475ea5a8%22%2C%22exportedName%22%3A%22loginUser%22%7D%2C%7B%22id%22%3A%2240d1ba13b5b4045b2963cad53b2e5ccab21908e4b2%22%2C%22exportedName%22%3A%22registerUser%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/login/page": "action-browser",
+        "app/register/page": "action-browser"
+      }
+    },
+    "40d1ba13b5b4045b2963cad53b2e5ccab21908e4b2": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fauth.ts%22%2C%5B%7B%22id%22%3A%22404df39bd36ee279cdcaa2ed919f1c4268475ea5a8%22%2C%22exportedName%22%3A%22loginUser%22%7D%2C%7B%22id%22%3A%2240d1ba13b5b4045b2963cad53b2e5ccab21908e4b2%22%2C%22exportedName%22%3A%22registerUser%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        },
+        "app/register/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fauth.ts%22%2C%5B%7B%22id%22%3A%22404df39bd36ee279cdcaa2ed919f1c4268475ea5a8%22%2C%22exportedName%22%3A%22loginUser%22%7D%2C%7B%22id%22%3A%2240d1ba13b5b4045b2963cad53b2e5ccab21908e4b2%22%2C%22exportedName%22%3A%22registerUser%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/login/page": "action-browser",
+        "app/register/page": "action-browser"
+      }
+    },
+    "400f37d169c1a17a33ca72f602f5cfe8b6a1844b47": {
+      "workers": {
+        "app/upload/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fresume-parsing.ts%22%2C%5B%7B%22id%22%3A%22400f37d169c1a17a33ca72f602f5cfe8b6a1844b47%22%2C%22exportedName%22%3A%22parseResume%22%7D%5D%5D%2C%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fresume.ts%22%2C%5B%7B%22id%22%3A%22409fd0e7e3926c9a3022863a3d54c48867a2047eb2%22%2C%22exportedName%22%3A%22getUserResume%22%7D%2C%7B%22id%22%3A%2260a191d58a3eef3833dea74309ddb0d11ff826da96%22%2C%22exportedName%22%3A%22saveUserResume%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/upload/page": "action-browser"
+      }
+    },
+    "4095f7f50cc39c8e0e3a61f65563ea9991a7e1a0f4": {
+      "workers": {
+        "app/matches/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fsmart-job-matching.ts%22%2C%5B%7B%22id%22%3A%224095f7f50cc39c8e0e3a61f65563ea9991a7e1a0f4%22%2C%22exportedName%22%3A%22smartJobMatching%22%7D%5D%5D%2C%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fresume.ts%22%2C%5B%7B%22id%22%3A%22409fd0e7e3926c9a3022863a3d54c48867a2047eb2%22%2C%22exportedName%22%3A%22getUserResume%22%7D%2C%7B%22id%22%3A%2260a191d58a3eef3833dea74309ddb0d11ff826da96%22%2C%22exportedName%22%3A%22saveUserResume%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/matches/page": "action-browser"
+      }
+    },
+    "409fd0e7e3926c9a3022863a3d54c48867a2047eb2": {
+      "workers": {
+        "app/upload/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fresume-parsing.ts%22%2C%5B%7B%22id%22%3A%22400f37d169c1a17a33ca72f602f5cfe8b6a1844b47%22%2C%22exportedName%22%3A%22parseResume%22%7D%5D%5D%2C%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fresume.ts%22%2C%5B%7B%22id%22%3A%22409fd0e7e3926c9a3022863a3d54c48867a2047eb2%22%2C%22exportedName%22%3A%22getUserResume%22%7D%2C%7B%22id%22%3A%2260a191d58a3eef3833dea74309ddb0d11ff826da96%22%2C%22exportedName%22%3A%22saveUserResume%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        },
+        "app/matches/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fsmart-job-matching.ts%22%2C%5B%7B%22id%22%3A%224095f7f50cc39c8e0e3a61f65563ea9991a7e1a0f4%22%2C%22exportedName%22%3A%22smartJobMatching%22%7D%5D%5D%2C%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fresume.ts%22%2C%5B%7B%22id%22%3A%22409fd0e7e3926c9a3022863a3d54c48867a2047eb2%22%2C%22exportedName%22%3A%22getUserResume%22%7D%2C%7B%22id%22%3A%2260a191d58a3eef3833dea74309ddb0d11ff826da96%22%2C%22exportedName%22%3A%22saveUserResume%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/upload/page": "action-browser",
+        "app/matches/page": "action-browser"
+      }
+    },
+    "60a191d58a3eef3833dea74309ddb0d11ff826da96": {
+      "workers": {
+        "app/upload/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fresume-parsing.ts%22%2C%5B%7B%22id%22%3A%22400f37d169c1a17a33ca72f602f5cfe8b6a1844b47%22%2C%22exportedName%22%3A%22parseResume%22%7D%5D%5D%2C%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fresume.ts%22%2C%5B%7B%22id%22%3A%22409fd0e7e3926c9a3022863a3d54c48867a2047eb2%22%2C%22exportedName%22%3A%22getUserResume%22%7D%2C%7B%22id%22%3A%2260a191d58a3eef3833dea74309ddb0d11ff826da96%22%2C%22exportedName%22%3A%22saveUserResume%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        },
+        "app/matches/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fsmart-job-matching.ts%22%2C%5B%7B%22id%22%3A%224095f7f50cc39c8e0e3a61f65563ea9991a7e1a0f4%22%2C%22exportedName%22%3A%22smartJobMatching%22%7D%5D%5D%2C%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Factions%2Fresume.ts%22%2C%5B%7B%22id%22%3A%22409fd0e7e3926c9a3022863a3d54c48867a2047eb2%22%2C%22exportedName%22%3A%22getUserResume%22%7D%2C%7B%22id%22%3A%2260a191d58a3eef3833dea74309ddb0d11ff826da96%22%2C%22exportedName%22%3A%22saveUserResume%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/upload/page": "action-browser",
+        "app/matches/page": "action-browser"
+      }
+    }
+  },
+  "edge": {},
+  "encryptionKey": "yvbcCmJzFOUNnnr2TsD1NAmENoxNBq/EknEJB13ZD6o="
+}
