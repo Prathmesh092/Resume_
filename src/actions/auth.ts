@@ -24,6 +24,8 @@ export async function registerUser(data: z.infer<typeof RegisterInputSchema>) {
   try {
     const validation = RegisterInputSchema.safeParse(data);
     if (!validation.success) {
+      // Log client-side validation errors on server for completeness if needed, though client handles display
+      console.error('Server-side validation failed for registration:', validation.error.flatten().fieldErrors);
       return { success: false, message: "Invalid input.", errors: validation.error.flatten().fieldErrors };
     }
 
@@ -44,17 +46,28 @@ export async function registerUser(data: z.infer<typeof RegisterInputSchema>) {
     });
     return { success: true, message: 'User registered successfully. Please log in.' };
   } catch (error) {
-    console.error('Registration error:', error);
-    let message = 'An error occurred during registration. Please try again later.';
+    console.error('Registration error details:');
+    let userFacingMessage: string;
+
     if (error instanceof MongoError) {
-        message = 'A database error occurred during registration. Please try again later.';
-        console.error(`MongoError Code: ${error.code}, Name: ${error.name}`);
+        console.error(`  Type: MongoError`);
+        console.error(`  Code: ${error.code}`);
+        console.error(`  Name: ${error.name}`);
+        console.error(`  Message: ${error.message}`);
+        if (error.stack) console.error(`  Stack:\n${error.stack}`);
+        userFacingMessage = 'A database error occurred during registration. Please try again later.';
     } else if (error instanceof Error) {
-        console.error('Non-MongoDB Error name:', error.name);
-        // Potentially use error.message if it's deemed safe and user-friendly
-        // For now, stick to a generic message for client.
+        console.error(`  Type: Generic Error`);
+        console.error(`  Name: ${error.name}`);
+        console.error(`  Message: ${error.message}`);
+        if (error.stack) console.error(`  Stack:\n${error.stack}`);
+        userFacingMessage = 'An error occurred during registration. Please try again later.';
+    } else {
+        console.error('  Type: Unknown error type');
+        console.error(error);
+        userFacingMessage = 'An unexpected error of unknown type occurred. Please try again later.';
     }
-    return { success: false, message: message };
+    return { success: false, message: userFacingMessage };
   }
 }
 
@@ -67,6 +80,7 @@ export async function loginUser(data: z.infer<typeof LoginInputSchema>) {
   try {
     const validation = LoginInputSchema.safeParse(data);
     if (!validation.success) {
+      console.error('Server-side validation failed for login:', validation.error.flatten().fieldErrors);
       return { success: false, message: "Invalid input.", errors: validation.error.flatten().fieldErrors };
     }
 
@@ -86,23 +100,33 @@ export async function loginUser(data: z.infer<typeof LoginInputSchema>) {
       return { success: false, message: 'Incorrect email or password.' };
     }
 
-    // In a real app, generate and return a session token/JWT here.
-    // For this prototype, we return basic user info.
     return {
       success: true,
       message: 'Login successful!',
       user: { email: user.email, id: user._id?.toString() }
     };
   } catch (error) {
-    console.error('Login error:', error);
-    let message = 'An error occurred during login. Please try again later.';
+    console.error('Login error details:');
+    let userFacingMessage: string;
+
     if (error instanceof MongoError) {
-        message = 'A database error occurred during login. Please try again later.';
-        console.error(`MongoError Code: ${error.code}, Name: ${error.name}`);
+        console.error(`  Type: MongoError`);
+        console.error(`  Code: ${error.code}`);
+        console.error(`  Name: ${error.name}`);
+        console.error(`  Message: ${error.message}`);
+        if (error.stack) console.error(`  Stack:\n${error.stack}`);
+        userFacingMessage = 'A database error occurred during login. Please try again later.';
     } else if (error instanceof Error) {
-        console.error('Non-MongoDB Error name:', error.name);
+        console.error(`  Type: Generic Error`);
+        console.error(`  Name: ${error.name}`);
+        console.error(`  Message: ${error.message}`);
+        if (error.stack) console.error(`  Stack:\n${error.stack}`);
+        userFacingMessage = 'An error occurred during login. Please try again later.';
+    } else {
+        console.error('  Type: Unknown error type');
+        console.error(error);
+        userFacingMessage = 'An unexpected error of unknown type occurred during login. Please try again later.';
     }
-    return { success: false, message: message };
+    return { success: false, message: userFacingMessage };
   }
 }
-
