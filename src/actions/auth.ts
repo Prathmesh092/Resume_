@@ -1,6 +1,8 @@
+
 'use server';
 import { clientPromise, dbName } from '@/lib/mongodb';
 import { z } from 'zod';
+import { MongoError } from 'mongodb';
 
 // IMPORTANT: In a real application, you MUST hash passwords using a library like bcryptjs.
 // Storing plain text passwords is a major security risk.
@@ -35,15 +37,24 @@ export async function registerUser(data: z.infer<typeof RegisterInputSchema>) {
     }
 
     // const hashedPassword = await bcrypt.hash(validation.data.password, 10); // Example for production
-    await usersCollection.insertOne({ 
-      email: validation.data.email, 
+    await usersCollection.insertOne({
+      email: validation.data.email,
       password: validation.data.password, // Store plain password - NOT FOR PRODUCTION
       createdAt: new Date(),
     });
     return { success: true, message: 'User registered successfully. Please log in.' };
   } catch (error) {
     console.error('Registration error:', error);
-    return { success: false, message: 'An error occurred during registration.' };
+    let message = 'An error occurred during registration. Please try again later.';
+    if (error instanceof MongoError) {
+        message = 'A database error occurred during registration. Please try again later.';
+        console.error(`MongoError Code: ${error.code}, Name: ${error.name}`);
+    } else if (error instanceof Error) {
+        console.error('Non-MongoDB Error name:', error.name);
+        // Potentially use error.message if it's deemed safe and user-friendly
+        // For now, stick to a generic message for client.
+    }
+    return { success: false, message: message };
   }
 }
 
@@ -74,16 +85,24 @@ export async function loginUser(data: z.infer<typeof LoginInputSchema>) {
     if (!isPasswordValid) {
       return { success: false, message: 'Incorrect email or password.' };
     }
-    
+
     // In a real app, generate and return a session token/JWT here.
     // For this prototype, we return basic user info.
-    return { 
-      success: true, 
-      message: 'Login successful!', 
-      user: { email: user.email, id: user._id?.toString() } 
+    return {
+      success: true,
+      message: 'Login successful!',
+      user: { email: user.email, id: user._id?.toString() }
     };
   } catch (error) {
     console.error('Login error:', error);
-    return { success: false, message: 'An error occurred during login.' };
+    let message = 'An error occurred during login. Please try again later.';
+    if (error instanceof MongoError) {
+        message = 'A database error occurred during login. Please try again later.';
+        console.error(`MongoError Code: ${error.code}, Name: ${error.name}`);
+    } else if (error instanceof Error) {
+        console.error('Non-MongoDB Error name:', error.name);
+    }
+    return { success: false, message: message };
   }
 }
+
