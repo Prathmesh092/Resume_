@@ -12,8 +12,7 @@ import { AlertCircle, FileText, SearchX } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-
-const PARSED_RESUME_LOCAL_STORAGE_KEY = 'jobmatcher_parsed_resume';
+import { PARSED_RESUME_LOCAL_STORAGE_KEY } from '@/lib/constants';
 
 export default function JobMatchesPage() {
   const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
@@ -27,14 +26,13 @@ export default function JobMatchesPage() {
       const storedResume = localStorage.getItem(PARSED_RESUME_LOCAL_STORAGE_KEY);
       if (storedResume) {
         const resumeData = JSON.parse(storedResume) as ParsedResume;
-        // Basic validation of stored data structure
         if (resumeData && Array.isArray(resumeData.skills) && Array.isArray(resumeData.experience) && Array.isArray(resumeData.education)) {
             setParsedResume(resumeData);
-            setJobSearchTrigger(prev => prev + 1); // Trigger job search
+            setJobSearchTrigger(prev => prev + 1); 
         } else {
             console.warn("Invalid resume data structure in localStorage.");
             setErrorLoadingResume("The stored resume data is not in the expected format. Please try uploading again.");
-            localStorage.removeItem(PARSED_RESUME_LOCAL_STORAGE_KEY); // Clear invalid data
+            localStorage.removeItem(PARSED_RESUME_LOCAL_STORAGE_KEY); 
         }
       }
     } catch (error) {
@@ -49,12 +47,12 @@ export default function JobMatchesPage() {
     return (
       <AppLayout>
         <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-          <Skeleton className="h-12 w-1/2 mx-auto" /> {/* Title skeleton */}
+          <Skeleton className="h-12 w-1/2 mx-auto" /> 
           <div className="max-w-4xl mx-auto space-y-4">
-            <Skeleton className="h-64 w-full" /> {/* ResumeInsightsCard skeleton */}
+            <Skeleton className="h-64 w-full" /> 
           </div>
           <Separator className="my-8" />
-           <Skeleton className="h-10 w-1/3 mx-auto mb-6" /> {/* JobListings title skeleton */}
+           <Skeleton className="h-10 w-1/3 mx-auto mb-6" /> 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, index) => (
               <div key={index} className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 space-y-3">
@@ -116,7 +114,6 @@ export default function JobMatchesPage() {
   return (
     <AppLayout>
       <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Section for Resume Summary View */}
         <div className="space-y-6 py-8">
           <h2 className="text-3xl font-bold tracking-tight text-center">
             Your Resume Summary
@@ -128,7 +125,6 @@ export default function JobMatchesPage() {
 
         <Separator className="my-8" />
         
-        {/* Job Listings section */}
         <JobListings parsedResumeData={parsedResume} triggerSearch={jobSearchTrigger} />
       </div>
     </AppLayout>

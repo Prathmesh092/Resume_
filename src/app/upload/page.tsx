@@ -9,8 +9,7 @@ import type { ParsedResume } from '@/types';
 import { Loader2, ScanText, FileUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-const PARSED_RESUME_LOCAL_STORAGE_KEY = 'jobmatcher_parsed_resume';
+import { PARSED_RESUME_LOCAL_STORAGE_KEY } from '@/lib/constants';
 
 export default function UploadResumePage() {
   const [isProcessing, setIsProcessing] = useState(false);

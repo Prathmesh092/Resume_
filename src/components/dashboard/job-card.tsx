@@ -10,12 +10,11 @@ import { Briefcase, MapPin, ExternalLink, Sparkles, Info, Bookmark, BookmarkChec
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { SAVED_JOBS_LOCAL_STORAGE_KEY } from '@/lib/constants';
 
 interface JobCardProps {
   job: MatchedJob;
 }
-
-const SAVED_JOBS_LOCAL_STORAGE_KEY = 'jobmatcher_saved_jobs';
 
 export function JobCard({ job }: JobCardProps) {
   const [isSaved, setIsSaved] = useState(false);
@@ -30,7 +29,6 @@ export function JobCard({ job }: JobCardProps) {
         }
     } catch (error) {
         console.error("Error reading saved jobs from localStorage:", error);
-        // Silently fail, or show a generic error toast if critical
     }
   }, [job.id]);
 
@@ -40,14 +38,12 @@ export function JobCard({ job }: JobCardProps) {
         let savedJobIds: string[] = savedJobsString ? JSON.parse(savedJobsString) : [];
 
         if (isSaved) {
-        // Unsave: Remove job ID
         savedJobIds = savedJobIds.filter(id => id !== job.id);
         toast({
             title: "Job Unsaved",
             description: `"${job.title}" removed from your saved jobs.`,
         });
         } else {
-        // Save: Add job ID
         savedJobIds.push(job.id);
         toast({
             title: "Job Saved!",

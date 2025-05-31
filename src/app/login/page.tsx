@@ -21,11 +21,8 @@ import { useToast } from "@/hooks/use-toast";
 import { AppLayout } from "@/components/layout/app-layout";
 import { LogIn, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { loginUser } from "@/actions/auth"; // Import the server action
-
-// Keys for storing user info in localStorage
-const JOBMATCHER_USER_EMAIL_KEY = 'jobmatcher_user_email';
-const JOBMATCHER_USER_ID_KEY = 'jobmatcher_user_id';
+import { loginUser } from "@/actions/auth";
+import { JOBMATCHER_USER_EMAIL_KEY, JOBMATCHER_USER_ID_KEY } from "@/lib/constants";
 
 
 const loginSchema = z.object({
@@ -64,7 +61,7 @@ export default function LoginPage() {
           className: "bg-accent text-accent-foreground"
         });
         router.push("/"); 
-        router.refresh(); // To re-trigger header update
+        router.refresh(); 
       } else {
         toast({
           title: "Login Failed",

@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-
-const JOBMATCHER_USER_EMAIL_KEY = 'jobmatcher_user_email';
-const JOBMATCHER_USER_ID_KEY = 'jobmatcher_user_id';
-const PARSED_RESUME_LOCAL_STORAGE_KEY = 'jobmatcher_parsed_resume';
-const SAVED_JOBS_LOCAL_STORAGE_KEY = 'jobmatcher_saved_jobs';
+import { 
+  JOBMATCHER_USER_EMAIL_KEY, 
+  JOBMATCHER_USER_ID_KEY, 
+  PARSED_RESUME_LOCAL_STORAGE_KEY, 
+  SAVED_JOBS_LOCAL_STORAGE_KEY 
+} from '@/lib/constants';
 
 
 export function Header() {
@@ -22,7 +23,7 @@ export function Header() {
   useEffect(() => {
     const userEmail = localStorage.getItem(JOBMATCHER_USER_EMAIL_KEY);
     setIsLoggedIn(!!userEmail);
-  }, [pathname]); // Re-check on pathname change for SPA behavior
+  }, [pathname]); 
 
   const handleLogout = () => {
     localStorage.removeItem(JOBMATCHER_USER_EMAIL_KEY);
@@ -30,7 +31,7 @@ export function Header() {
     localStorage.removeItem(PARSED_RESUME_LOCAL_STORAGE_KEY); 
     localStorage.removeItem(SAVED_JOBS_LOCAL_STORAGE_KEY); 
     setIsLoggedIn(false);
-    router.push('/login'); // Redirect to login after logout
+    router.push('/login'); 
     router.refresh(); 
   };
 
@@ -98,7 +99,6 @@ export function Header() {
           )}
         </div>
       </div>
-      {/* Mobile Nav */}
       {isLoggedIn && (
         <nav className="md:hidden flex justify-around p-2 border-t">
             {navItems.map((item) => (

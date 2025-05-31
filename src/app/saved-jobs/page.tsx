@@ -11,8 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BookmarkX, Search, FileText } from 'lucide-react';
-
-const SAVED_JOBS_LOCAL_STORAGE_KEY = 'jobmatcher_saved_jobs';
+import { SAVED_JOBS_LOCAL_STORAGE_KEY } from '@/lib/constants';
 
 export default function SavedJobsPage() {
   const [savedJobs, setSavedJobs] = useState<MatchedJob[]>([]);
@@ -27,23 +26,19 @@ export default function SavedJobsPage() {
       if (savedJobsString) {
         const savedJobIds: string[] = JSON.parse(savedJobsString);
         
-        // We need to find the full job details from mockJobs based on IDs.
-        // And since JobCard expects MatchedJob, we'll add dummy matchScore & justification.
         const foundJobs = savedJobIds.map(id => {
           const jobDetail = mockJobs.find(job => job.id === id);
           if (jobDetail) {
-            // Augment with dummy MatchedJob properties if not present
-            // In a real app, saved jobs might store full MatchedJob data or re-fetch match scores.
             return {
               ...jobDetail,
-              matchScore: (jobDetail as MatchedJob).matchScore || 0, // Use existing or default
-              justification: (jobDetail as MatchedJob).justification || "Not available for saved job.", // Use existing or default
+              matchScore: (jobDetail as MatchedJob).matchScore || 0, 
+              justification: (jobDetail as MatchedJob).justification || "Not available for saved job.", 
             } as MatchedJob;
           }
           return null;
         }).filter(job => job !== null) as MatchedJob[];
 
-        setSavedJobs(foundJobs.reverse()); // Show most recently saved first
+        setSavedJobs(foundJobs.reverse()); 
       } else {
         setSavedJobs([]);
       }
@@ -60,7 +55,7 @@ export default function SavedJobsPage() {
     return (
       <AppLayout>
         <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-          <Skeleton className="h-12 w-1/2 mx-auto mb-10" /> {/* Title skeleton */}
+          <Skeleton className="h-12 w-1/2 mx-auto mb-10" /> 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, index) => (
               <div key={index} className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 space-y-3">

@@ -7,14 +7,12 @@ import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, Upload, ListChecks, ArrowRight } from 'lucide-react';
-
-const PARSED_RESUME_LOCAL_STORAGE_KEY = 'jobmatcher_parsed_resume';
+import { PARSED_RESUME_LOCAL_STORAGE_KEY } from '@/lib/constants';
 
 export default function DashboardHomePage() {
   const [hasProcessedResume, setHasProcessedResume] = useState(false);
 
   useEffect(() => {
-    // Check if resume data exists in localStorage
     const storedResume = localStorage.getItem(PARSED_RESUME_LOCAL_STORAGE_KEY);
     setHasProcessedResume(!!storedResume);
   }, []);
@@ -77,29 +75,6 @@ export default function DashboardHomePage() {
           </Card>
         </div>
         
-        {/* Placeholder for future dashboard elements if any */}
-        {/* 
-        <Separator className="my-12" />
-        <section>
-          <h2 className="text-3xl font-bold tracking-tight text-center mb-8">
-            Your Activity At a Glance
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader><CardTitle>Applications Sent</CardTitle></CardHeader>
-              <CardContent><p className="text-4xl font-bold">0</p></CardContent>
-            </Card>
-            <Card>
-              <CardHeader><CardTitle>Saved Jobs</CardTitle></CardHeader>
-              <CardContent><p className="text-4xl font-bold">0</p></CardContent>
-            </Card>
-             <Card>
-              <CardHeader><CardTitle>Profile Views</CardTitle></CardHeader>
-              <CardContent><p className="text-4xl font-bold">0</p></CardContent>
-            </Card>
-          </div>
-        </section> 
-        */}
       </div>
     </AppLayout>
   );
