@@ -1,3 +1,5 @@
+
+import * as React from 'react';
 import type { ParsedResume } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +9,7 @@ interface ResumeInsightsCardProps {
   resumeData: ParsedResume;
 }
 
-export function ResumeInsightsCard({ resumeData }: ResumeInsightsCardProps) {
+export const ResumeInsightsCard = React.memo(function ResumeInsightsCard({ resumeData }: ResumeInsightsCardProps) {
   return (
     <Card className="w-full shadow-lg">
       <CardHeader>
@@ -74,4 +76,6 @@ export function ResumeInsightsCard({ resumeData }: ResumeInsightsCardProps) {
       </CardContent>
     </Card>
   );
-}
+});
+
+ResumeInsightsCard.displayName = 'ResumeInsightsCard';

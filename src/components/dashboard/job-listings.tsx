@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
@@ -7,8 +8,10 @@ import type { ParsedResume, MatchedJob } from '@/types';
 import { JobCard } from './job-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; // Import full Card components
 import { FileSearch, AlertTriangle } from 'lucide-react';
 import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 interface JobListingsProps {
   parsedResumeData: ParsedResume | null;
@@ -151,11 +154,3 @@ export function JobListings({ parsedResumeData, triggerSearch }: JobListingsProp
     </div>
   );
 }
-
-// Basic Card and Skeleton components to avoid import errors if not defined elsewhere
-// In a real app, these would come from @/components/ui
-const Card = ({ className, children }: {className?: string, children: React.ReactNode}) => <div className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)}>{children}</div>;
-const CardHeader = ({ className, children }: {className?: string, children: React.ReactNode}) => <div className={cn("flex flex-col space-y-1.5 p-6", className)}>{children}</div>;
-const CardContent = ({ className, children }: {className?: string, children: React.ReactNode}) => <div className={cn("p-6 pt-0", className)}>{children}</div>;
-const CardFooter = ({ className, children }: {className?: string, children: React.ReactNode}) => <div className={cn("flex items-center p-6 pt-0", className)}>{children}</div>;
-import { cn } from '@/lib/utils';

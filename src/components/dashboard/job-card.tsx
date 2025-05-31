@@ -1,6 +1,7 @@
 
 "use client";
 
+import * as React from 'react'; // Ensure React is imported for React.memo
 import type { MatchedJob } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ interface JobCardProps {
   job: MatchedJob;
 }
 
-export function JobCard({ job }: JobCardProps) {
+export const JobCard = React.memo(function JobCard({ job }: JobCardProps) {
   const [isSaved, setIsSaved] = useState(false);
   const { toast } = useToast();
 
@@ -119,4 +120,6 @@ export function JobCard({ job }: JobCardProps) {
       </CardFooter>
     </Card>
   );
-}
+});
+
+JobCard.displayName = 'JobCard';
