@@ -8,7 +8,11 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
-const MOCK_AUTH_TOKEN_KEY = 'jobmatcher_mock_auth_token';
+const JOBMATCHER_USER_EMAIL_KEY = 'jobmatcher_user_email';
+const JOBMATCHER_USER_ID_KEY = 'jobmatcher_user_id';
+const PARSED_RESUME_LOCAL_STORAGE_KEY = 'jobmatcher_parsed_resume';
+const SAVED_JOBS_LOCAL_STORAGE_KEY = 'jobmatcher_saved_jobs';
+
 
 export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,16 +20,17 @@ export function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const token = localStorage.getItem(MOCK_AUTH_TOKEN_KEY);
-    setIsLoggedIn(!!token);
+    const userEmail = localStorage.getItem(JOBMATCHER_USER_EMAIL_KEY);
+    setIsLoggedIn(!!userEmail);
   }, [pathname]); // Re-check on pathname change for SPA behavior
 
   const handleLogout = () => {
-    localStorage.removeItem(MOCK_AUTH_TOKEN_KEY);
-    localStorage.removeItem('jobmatcher_parsed_resume'); // Clear resume data on logout
-    localStorage.removeItem('jobmatcher_saved_jobs'); // Clear saved jobs on logout
+    localStorage.removeItem(JOBMATCHER_USER_EMAIL_KEY);
+    localStorage.removeItem(JOBMATCHER_USER_ID_KEY);
+    localStorage.removeItem(PARSED_RESUME_LOCAL_STORAGE_KEY); 
+    localStorage.removeItem(SAVED_JOBS_LOCAL_STORAGE_KEY); 
     setIsLoggedIn(false);
-    router.push('/'); 
+    router.push('/login'); // Redirect to login after logout
     router.refresh(); 
   };
 
@@ -102,7 +107,7 @@ export function Header() {
                 variant="ghost"
                 asChild
                 className={cn(
-                  "flex-col h-auto p-1 text-xs w-1/4", // Adjusted for 4 items
+                  "flex-col h-auto p-1 text-xs w-1/4", 
                   pathname === item.href
                     ? "text-primary"
                     : "text-muted-foreground"

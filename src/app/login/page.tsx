@@ -21,10 +21,12 @@ import { useToast } from "@/hooks/use-toast";
 import { AppLayout } from "@/components/layout/app-layout";
 import { LogIn, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { loginUser } from "@/actions/auth"; // Import the server action
 
-const MOCK_AUTH_TOKEN_KEY = 'jobmatcher_mock_auth_token';
-const MOCK_EMAIL = "test@example.com";
-const MOCK_PASSWORD = "password123";
+// Keys for storing user info in localStorage
+const JOBMATCHER_USER_EMAIL_KEY = 'jobmatcher_user_email';
+const JOBMATCHER_USER_ID_KEY = 'jobmatcher_user_id';
+
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -46,25 +48,37 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    // Simulate API call & credential check
-    if (data.email === MOCK_EMAIL && data.password === MOCK_PASSWORD) {
-      localStorage.setItem(MOCK_AUTH_TOKEN_KEY, "mock_user_token_logged_in");
-      
-      toast({
-        title: "Login Successful",
-        description: "Welcome back!",
-        variant: "default",
-        className: "bg-accent text-accent-foreground"
-      });
-      router.push("/"); 
-      router.refresh(); 
-    } else {
-      toast({
-        title: "Incorrect email or password",
-        description: "Please check your credentials and try again.",
-        variant: "destructive",
-      });
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      const result = await loginUser(data);
+      if (result.success && result.user) {
+        localStorage.setItem(JOBMATCHER_USER_EMAIL_KEY, result.user.email);
+        if (result.user.id) {
+            localStorage.setItem(JOBMATCHER_USER_ID_KEY, result.user.id);
+        }
+        
+        toast({
+          title: "Login Successful",
+          description: result.message,
+          variant: "default",
+          className: "bg-accent text-accent-foreground"
+        });
+        router.push("/"); 
+        router.refresh(); // To re-trigger header update
+      } else {
+        toast({
+          title: "Login Failed",
+          description: result.message || "Incorrect email or password. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+        console.error("Login submission error:", error);
+        toast({
+            title: "Error",
+            description: "An unexpected error occurred during login.",
+            variant: "destructive",
+        });
     }
   };
 

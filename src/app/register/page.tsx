@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { AppLayout } from "@/components/layout/app-layout";
 import { UserPlus } from "lucide-react";
+import { registerUser } from "@/actions/auth"; // Import the server action
 
 const registerSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -27,7 +28,7 @@ const registerSchema = z.object({
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match.",
-  path: ["confirmPassword"], // path to field that gets the error
+  path: ["confirmPassword"],
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -44,16 +45,32 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    // Simulate API call & successful registration
-    console.log("Registration data:", data);
-    // In a real app, you would create a new user with a backend.
-    
-    toast({
-      title: "Registration Successful",
-      description: "Your account has been created. Please log in.",
-    });
-    router.push("/login"); // Redirect to login page
+  const onSubmit = async (data: RegisterFormValues) => {
+    try {
+      const result = await registerUser({ email: data.email, password: data.password });
+      if (result.success) {
+        toast({
+          title: "Registration Successful",
+          description: result.message,
+          variant: "default",
+          className: "bg-accent text-accent-foreground"
+        });
+        router.push("/login");
+      } else {
+        toast({
+          title: "Registration Failed",
+          description: result.message || "An unknown error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Registration submission error:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred during registration.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
