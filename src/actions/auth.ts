@@ -16,7 +16,20 @@ type UserDB = z.infer<typeof UserDBSchema> & { _id?: import('mongodb').ObjectId 
 
 
 const RegisterInputSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
+  email: z.string()
+    .email({ message: "Invalid email format." }) // General email format check
+    .refine(email => {
+      // Ensure email is not undefined or null before splitting
+      if (!email) return false;
+      const parts = email.split('@');
+      // Check if email has a local part
+      if (parts.length === 0 || parts[0] === undefined) return false;
+      const localPart = parts[0];
+      // Regex to check allowed characters and ensure local part is not empty
+      // Allows letters (a-z, A-Z), numbers (0-9), and periods (.), underscores (_), hyphens (-)
+      // The '+' ensures the local part is not empty.
+      return /^[a-zA-Z0-9._-]+$/.test(localPart);
+    }, { message: "Email username (part before @) can only contain letters (a-z, A-Z), numbers (0-9), periods (.), underscores (_), or hyphens (-), and must not be empty." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
 
