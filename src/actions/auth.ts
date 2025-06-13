@@ -17,19 +17,39 @@ type UserDB = z.infer<typeof UserDBSchema> & { _id?: import('mongodb').ObjectId 
 
 const RegisterInputSchema = z.object({
   email: z.string()
-    .email({ message: "Invalid email format." }) // General email format check
+    .email({ message: "Invalid email address format." }) // Basic email format check
     .refine(email => {
-      // Ensure email is not undefined or null before splitting
-      if (!email) return false;
       const parts = email.split('@');
-      // Check if email has a local part
-      if (parts.length === 0 || parts[0] === undefined) return false;
+      // Technically, .email() should catch if there's no @ or multiple @s,
+      // but this is a defensive check.
+      if (parts.length !== 2) return false;
+
       const localPart = parts[0];
-      // Regex to check allowed characters and ensure local part is not empty
-      // Allows letters (a-z, A-Z), numbers (0-9), and periods (.), underscores (_), hyphens (-)
-      // The '+' ensures the local part is not empty.
-      return /^[a-zA-Z0-9._-]+$/.test(localPart);
-    }, { message: "Email username (part before @) can only contain letters (a-z, A-Z), numbers (0-9), periods (.), underscores (_), or hyphens (-), and must not be empty." }),
+      const domainPart = parts[1];
+
+      // 1. Must end with @gmail.com (case-insensitive for "gmail.com")
+      if (domainPart.toLowerCase() !== "gmail.com") return false;
+
+      // 2. Local part (username) cannot be empty
+      if (!localPart) return false;
+
+      // 3. Local part can only contain letters (a-z, A-Z), numbers (0-9), and dots (.)
+      //    No spaces or other special characters.
+      const usernameRegex = /^[a-zA-Z0-9.]+$/;
+      if (!usernameRegex.test(localPart)) return false;
+
+      // 4. Dots (.) cannot be at the start or end of the local part, and no consecutive dots.
+      if (localPart.startsWith('.') || localPart.endsWith('.') || localPart.includes('..')) {
+        return false;
+      }
+      
+      // Note: Gmail username length is typically 6-30 chars. This validation
+      // doesn't enforce length as it wasn't explicitly requested, but could be added.
+
+      return true;
+    }, {
+      message: "Email must be a valid @gmail.com address. Username can only contain letters, numbers, and single periods (not at start/end or consecutive)."
+    }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
 
@@ -143,3 +163,4 @@ export async function loginUser(data: z.infer<typeof LoginInputSchema>) {
     return { success: false, message: userFacingMessage };
   }
 }
+
