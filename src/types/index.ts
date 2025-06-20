@@ -16,3 +16,18 @@ export interface UserResumeProfile extends ParsedResume {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface UserHistoryEntry {
+  _id?: import('mongodb').ObjectId; // MongoDB ObjectId
+  userId: string;
+  resumeId: string;
+  resumeTitle: string;
+  viewedAt: Date;
+}
+
+export interface DisplayHistoryEntry {
+  id: string; // MongoDB ObjectId as string
+  resumeId: string;
+  resumeTitle: string;
+  viewedAt: string; // Formatted date string for display
+}

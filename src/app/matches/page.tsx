@@ -14,7 +14,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getUserResume } from '@/actions/resume';
-import { JOBMATCHER_USER_ID_KEY } from '@/lib/constants';
+import { logResumeView } from '@/actions/history';
+import { JOBMATCHER_USER_ID_KEY, MY_PROFILE_RESUME_ID, MY_PROFILE_RESUME_TITLE } from '@/lib/constants';
 
 export default function JobMatchesPage() {
   const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
@@ -25,35 +26,32 @@ export default function JobMatchesPage() {
 
 
   useEffect(() => {
-    const loadResume = async () => {
+    const userId = localStorage.getItem(JOBMATCHER_USER_ID_KEY);
+    if (!userId) {
+      setErrorLoadingResume("User not identified. Please log in to view your matches or upload a resume.");
+      setIsLoadingResume(false);
+      return;
+    }
+
+    const loadResumeAndLogView = async () => {
       setIsLoadingResume(true);
       setErrorLoadingResume(null);
-      const userId = localStorage.getItem(JOBMATCHER_USER_ID_KEY);
-
-      if (!userId) {
-        setErrorLoadingResume("User not identified. Please log in to view your matches or upload a resume.");
-        setIsLoadingResume(false);
-        // Optional: Redirect to login after a short delay or with a button
-        // setTimeout(() => router.push('/login'), 3000); 
-        return;
-      }
-
       try {
         const result = await getUserResume(userId);
 
         if (result.success) {
           if (result.resume) {
-            // Basic validation of resume structure
             if (result.resume && Array.isArray(result.resume.skills) && Array.isArray(result.resume.experience) && Array.isArray(result.resume.education)) {
                 setParsedResume(result.resume);
-                setJobSearchTrigger(prev => prev + 1); 
+                setJobSearchTrigger(prev => prev + 1);
+                // Log the view after successfully loading and setting the resume
+                await logResumeView(userId, MY_PROFILE_RESUME_ID, MY_PROFILE_RESUME_TITLE);
             } else {
                 console.warn("Invalid resume data structure from DB.");
                 setErrorLoadingResume("The resume data from the server is not in the expected format. Try uploading again.");
                 setParsedResume(null);
             }
           } else {
-            // No resume found for the user is a valid state, not an error state for loading.
             setParsedResume(null); 
           }
         } else {
@@ -70,7 +68,7 @@ export default function JobMatchesPage() {
       }
     };
 
-    loadResume();
+    loadResumeAndLogView();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run once on mount
 
@@ -102,7 +100,6 @@ export default function JobMatchesPage() {
   }
   
   if (errorLoadingResume) {
-     // Specific message if user is not identified
      if (errorLoadingResume.includes("User not identified")) {
         return (
             <AppLayout>
@@ -121,7 +118,6 @@ export default function JobMatchesPage() {
             </AppLayout>
         );
      }
-     // General error message for other cases
      return (
       <AppLayout>
         <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center">
@@ -140,7 +136,7 @@ export default function JobMatchesPage() {
     );
   }
 
-  if (!parsedResume) { // This means loading is finished, no error, but no resume data
+  if (!parsedResume) { 
     return (
       <AppLayout>
         <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center">
@@ -181,4 +177,3 @@ export default function JobMatchesPage() {
     </AppLayout>
   );
 }
-

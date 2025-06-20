@@ -4,19 +4,21 @@
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, Upload, ListChecks, ArrowRight } from 'lucide-react';
-// PARSED_RESUME_LOCAL_STORAGE_KEY is no longer needed here
-// import { PARSED_RESUME_LOCAL_STORAGE_KEY } from '@/lib/constants';
-// useState and useEffect for hasProcessedResume are no longer needed
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Briefcase, Upload, ListChecks, ArrowRight, History } from 'lucide-react';
+import { RecentlyViewedCard } from '@/components/dashboard/recently-viewed-card';
+import { JOBMATCHER_USER_ID_KEY } from '@/lib/constants';
+import { useEffect, useState } from 'react';
+import { Separator } from '@/components/ui/separator';
+
 
 export default function DashboardHomePage() {
-  // const [hasProcessedResume, setHasProcessedResume] = useState(false); // Removed
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // useEffect(() => { // Removed
-  //   const storedResume = localStorage.getItem(PARSED_RESUME_LOCAL_STORAGE_KEY);
-  //   setHasProcessedResume(!!storedResume);
-  // }, []);
+  useEffect(() => {
+    const storedUserId = localStorage.getItem(JOBMATCHER_USER_ID_KEY);
+    setUserId(storedUserId);
+  }, []);
 
   return (
     <AppLayout>
@@ -33,8 +35,8 @@ export default function DashboardHomePage() {
           </p>
         </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1">
             <CardHeader>
               <div className="flex items-center mb-3">
                 <Upload className="h-8 w-8 text-primary mr-3" />
@@ -53,7 +55,7 @@ export default function DashboardHomePage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1">
             <CardHeader>
                <div className="flex items-center mb-3">
                 <ListChecks className="h-8 w-8 text-primary mr-3" />
@@ -71,8 +73,29 @@ export default function DashboardHomePage() {
               </Button>
             </CardContent>
           </Card>
+          
+          {userId && (
+            <div className="lg:col-span-1 w-full">
+                 <RecentlyViewedCard userId={userId} />
+            </div>
+          )}
         </div>
         
+        {!userId && (
+            <div className="md:col-span-2 lg:col-span-3 text-center py-6">
+                <Card className="p-6 max-w-md mx-auto shadow-lg border">
+                    <History className="h-10 w-10 text-primary mx-auto mb-3"/>
+                    <CardTitle className="text-xl mb-2">Track Your Activity</CardTitle>
+                    <CardDescription className="text-muted-foreground mb-4">
+                        Log in to see your recently viewed resume insights and easily pick up where you left off.
+                    </CardDescription>
+                    <Button asChild>
+                        <Link href="/login">Log In to View History</Link>
+                    </Button>
+                </Card>
+            </div>
+        )}
+
       </div>
     </AppLayout>
   );
