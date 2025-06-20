@@ -61,10 +61,13 @@ export function JobListings({ parsedResumeData, triggerSearch }: JobListingsProp
             jobDescription: job.description,
           });
           return { ...job, ...matchResult };
-        } catch (matchError) {
+        } catch (matchError: any) {
           console.error(`Error matching job ${job.id}:`, matchError);
-          // Optionally return job with a default low score or error state
-          return { ...job, matchScore: 0, justification: "Error in matching process." };
+          let justification = "Error in AI matching process for this job.";
+          if (matchError.message && (matchError.message.includes('429') || matchError.message.includes('QuotaFailure') || matchError.message.includes('rate limit'))) {
+            justification = "AI matching temporarily unavailable (rate limit).";
+          }
+          return { ...job, matchScore: 0, justification };
         }
       });
 
@@ -73,9 +76,13 @@ export function JobListings({ parsedResumeData, triggerSearch }: JobListingsProp
       results.sort((a, b) => b.matchScore - a.matchScore);
       setMatchedJobs(results);
 
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error fetching or matching jobs:', e);
-      setError('Failed to load and match job listings. Please try again.');
+      let errorMessage = 'Failed to load and match job listings. Please try again.';
+      if (e.message && (e.message.includes('429') || e.message.includes('QuotaFailure') || e.message.includes('rate limit'))) {
+        errorMessage = 'Could not fetch all job matches due to API rate limits. Please wait a few minutes and try refreshing the page or your matches.';
+      }
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +133,11 @@ export function JobListings({ parsedResumeData, triggerSearch }: JobListingsProp
       <Alert variant="destructive" className="w-full">
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
-        <AlertDescription>{error} <Button variant="link" onClick={fetchAndMatchJobs} className="p-0 h-auto">Try again</Button></AlertDescription>
+        <AlertDescription>{error} 
+          {!(error.includes('rate limit') || error.includes('QuotaFailure')) && ( // Only show "Try again" for non-rate limit errors
+            <Button variant="link" onClick={fetchAndMatchJobs} className="p-0 h-auto ml-1">Try again</Button>
+          )}
+        </AlertDescription>
       </Alert>
     );
   }
@@ -154,3 +165,4 @@ export function JobListings({ parsedResumeData, triggerSearch }: JobListingsProp
     </div>
   );
 }
+
