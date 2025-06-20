@@ -10,16 +10,19 @@ import { Loader2, ScanText, FileUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { saveUserResume } from '@/actions/resume';
+import { logResumeView } from '@/actions/history'; // Import logResumeView
 import { JOBMATCHER_USER_ID_KEY } from '@/lib/constants';
 
 export default function UploadResumePage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingError, setProcessingError] = useState<string | null>(null);
+  const [originalFileName, setOriginalFileName] = useState<string | null>(null); // Store filename
   const router = useRouter();
 
-  const handleParsingStart = () => {
+  const handleParsingStart = (fileName: string) => { // Accept filename
     setIsProcessing(true);
     setProcessingError(null);
+    setOriginalFileName(fileName); // Store it
   };
 
   const handleParsingComplete = async (data: ParsedResume) => {
@@ -27,14 +30,20 @@ export default function UploadResumePage() {
     if (!userId) {
       setProcessingError("User not identified. Please log in again to save your resume.");
       setIsProcessing(false);
-      // Consider redirecting to login or showing a more prominent error.
-      // router.push('/login'); 
+      return;
+    }
+
+    if (!originalFileName) {
+      setProcessingError("Original filename not available. Cannot log history.");
+      setIsProcessing(false);
       return;
     }
 
     try {
-      const saveResult = await saveUserResume(userId, data);
-      if (saveResult.success) {
+      const saveResult = await saveUserResume(userId, data, originalFileName); // Pass originalFileName
+      if (saveResult.success && saveResult.resumeId) {
+        // Log the upload event to history
+        await logResumeView(userId, saveResult.resumeId, originalFileName);
         setIsProcessing(false);
         router.push('/matches'); 
       } else {
@@ -43,8 +52,8 @@ export default function UploadResumePage() {
         setIsProcessing(false);
       }
     } catch (error) {
-      console.error("Error calling saveUserResume:", error);
-      setProcessingError("An unexpected error occurred while saving your resume. Please try again.");
+      console.error("Error calling saveUserResume or logResumeView:", error);
+      setProcessingError("An unexpected error occurred while saving your resume or logging history. Please try again.");
       setIsProcessing(false);
     }
   };

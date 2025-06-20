@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, Upload, ListChecks, ArrowRight, History } from 'lucide-react';
+import { Briefcase, Upload, ListChecks, ArrowRight, FileUp } from 'lucide-react'; // Changed History to FileUp
 import { RecentlyViewedCard } from '@/components/dashboard/recently-viewed-card';
 import { JOBMATCHER_USER_ID_KEY } from '@/lib/constants';
 import { useEffect, useState } from 'react';
@@ -84,13 +84,13 @@ export default function DashboardHomePage() {
         {!userId && (
             <div className="md:col-span-2 lg:col-span-3 text-center py-6">
                 <Card className="p-6 max-w-md mx-auto shadow-lg border">
-                    <History className="h-10 w-10 text-primary mx-auto mb-3"/>
-                    <CardTitle className="text-xl mb-2">Track Your Activity</CardTitle>
+                    <FileUp className="h-10 w-10 text-primary mx-auto mb-3"/>
+                    <CardTitle className="text-xl mb-2">Track Your Uploads</CardTitle>
                     <CardDescription className="text-muted-foreground mb-4">
-                        Log in to see your recently viewed resume insights and easily pick up where you left off.
+                        Log in to see your recently uploaded resumes and easily manage your profile.
                     </CardDescription>
                     <Button asChild>
-                        <Link href="/login">Log In to View History</Link>
+                        <Link href="/login">Log In to View Upload History</Link>
                     </Button>
                 </Card>
             </div>

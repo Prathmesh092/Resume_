@@ -4,33 +4,33 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getRecentViews } from '@/actions/history';
-import type { UserHistoryEntry } from '@/types';
+import type { UserHistoryEntry } from '@/types'; // UserHistoryEntry is general
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { History, EyeOff, ArrowRight } from 'lucide-react';
+import { History, FileUp, ArrowRight, UploadCloud } from 'lucide-react'; // Changed icon
 import { formatDistanceToNow } from 'date-fns';
 
 interface RecentlyViewedCardProps {
   userId: string | null;
 }
 
-interface DisplayHistoryItem extends Omit<UserHistoryEntry, 'viewedAt' | '_id'> {
+interface DisplayHistoryItem extends Omit<UserHistoryEntry, 'viewedAt' | '_id' | 'resumeId'> {
   id: string; // MongoDB ObjectId as string
+  resumeTitle: string; // This will be the filename
   viewedAt: Date; // Keep as Date for formatting
 }
 
 
 export function RecentlyViewedCard({ userId }: RecentlyViewedCardProps) {
-  const [recentViews, setRecentViews] = useState<DisplayHistoryItem[]>([]);
+  const [recentUploads, setRecentUploads] = useState<DisplayHistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) {
       setIsLoading(false);
-      //setError("User not logged in."); // Or simply show nothing
       return;
     }
 
@@ -40,21 +40,20 @@ export function RecentlyViewedCard({ userId }: RecentlyViewedCardProps) {
       try {
         const result = await getRecentViews(userId);
         if (result.success && result.history) {
-          // Ensure _id is correctly mapped and viewedAt is a Date object
           const mappedHistory = result.history.map(item => ({
-            ...item,
-            id: String(item._id), // Ensure _id is string
-            viewedAt: new Date(item.viewedAt), // Ensure viewedAt is Date
+            id: String(item._id), 
+            resumeTitle: item.resumeTitle, // This is now the filename
+            viewedAt: new Date(item.viewedAt),
           }));
-          setRecentViews(mappedHistory as DisplayHistoryItem[]);
+          setRecentUploads(mappedHistory as DisplayHistoryItem[]);
         } else {
-          setError(result.message || "Could not fetch recent views.");
-          setRecentViews([]);
+          setError(result.message || "Could not fetch recent uploads.");
+          setRecentUploads([]);
         }
       } catch (e) {
-        console.error("Error fetching recent views:", e);
+        console.error("Error fetching recent uploads:", e);
         setError("An unexpected error occurred while fetching history.");
-        setRecentViews([]);
+        setRecentUploads([]);
       } finally {
         setIsLoading(false);
       }
@@ -64,7 +63,7 @@ export function RecentlyViewedCard({ userId }: RecentlyViewedCardProps) {
   }, [userId]);
 
   if (!userId) {
-    return null; // Don't render if no user
+    return null; 
   }
 
   if (isLoading) {
@@ -72,12 +71,12 @@ export function RecentlyViewedCard({ userId }: RecentlyViewedCardProps) {
       <Card className="shadow-lg">
         <CardHeader>
           <div className="flex items-center mb-2">
-            <History className="h-6 w-6 text-primary mr-2" />
-            <CardTitle className="text-xl">Recently Viewed Resumes</CardTitle>
+            <FileUp className="h-6 w-6 text-primary mr-2" />
+            <CardTitle className="text-xl">Recently Uploaded Resumes</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          {[...Array(3)].map((_, i) => (
+          {[...Array(3)].map((_, i) => ( // Show 3 skeletons as an example, actual limit is 5
             <div key={i} className="flex justify-between items-center p-2 border-b">
               <Skeleton className="h-5 w-3/5" />
               <Skeleton className="h-4 w-1/5" />
@@ -93,8 +92,8 @@ export function RecentlyViewedCard({ userId }: RecentlyViewedCardProps) {
       <Card className="shadow-lg">
         <CardHeader>
           <div className="flex items-center mb-2">
-            <History className="h-6 w-6 text-primary mr-2" />
-            <CardTitle className="text-xl">Recently Viewed Resumes</CardTitle>
+            <FileUp className="h-6 w-6 text-primary mr-2" />
+            <CardTitle className="text-xl">Recently Uploaded Resumes</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -111,42 +110,44 @@ export function RecentlyViewedCard({ userId }: RecentlyViewedCardProps) {
     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <CardHeader>
         <div className="flex items-center mb-2">
-          <History className="h-7 w-7 text-primary mr-3" />
-          <CardTitle className="text-2xl">Recently Viewed</CardTitle>
+          <FileUp className="h-7 w-7 text-primary mr-3" />
+          <CardTitle className="text-2xl">Recently Uploaded</CardTitle>
         </div>
         <CardDescription>
-          Quick access to resume profiles you recently checked.
+          Your 5 most recently uploaded resumes. Insights are based on the latest one.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
-        {recentViews.length > 0 ? (
+        {recentUploads.length > 0 ? (
           <ul className="space-y-3">
-            {recentViews.map((item) => (
+            {recentUploads.map((item) => (
               <li key={item.id} className="p-3 border rounded-md bg-background/50 hover:bg-muted/80 transition-colors">
                 <Link href="/matches" className="flex justify-between items-center group">
                   <div>
-                    <p className="font-medium text-foreground group-hover:text-primary">{item.resumeTitle}</p>
+                    <p className="font-medium text-foreground group-hover:text-primary truncate max-w-[200px] sm:max-w-[250px]" title={item.resumeTitle}>
+                      {item.resumeTitle} {/* Display filename */}
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      Viewed {formatDistanceToNow(new Date(item.viewedAt), { addSuffix: true })}
+                      Uploaded {formatDistanceToNow(new Date(item.viewedAt), { addSuffix: true })}
                     </p>
                   </div>
-                  <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1 flex-shrink-0" />
                 </Link>
               </li>
             ))}
           </ul>
         ) : (
           <div className="text-center py-6 text-muted-foreground">
-            <EyeOff className="h-10 w-10 mx-auto mb-3" />
-            <p className="text-sm">No resume views recorded yet.</p>
-            <p className="text-xs">View your resume insights on the 'My Matches' page to populate this list.</p>
+            <UploadCloud className="h-10 w-10 mx-auto mb-3" />
+            <p className="text-sm">No resume uploads recorded yet.</p>
+            <p className="text-xs">Upload a resume to see it listed here.</p>
           </div>
         )}
       </CardContent>
-      {recentViews.length > 0 && (
+      {recentUploads.length > 0 && (
          <CardFooter className="pt-4 border-t">
             <Button asChild variant="link" className="w-full text-sm">
-                <Link href="/matches">View Full Resume Insights</Link>
+                <Link href="/upload">Upload Another Resume</Link>
             </Button>
         </CardFooter>
       )}

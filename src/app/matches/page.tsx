@@ -3,26 +3,26 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ResumeInsightsCard } from '@/components/dashboard/resume-insights-card';
 import { JobListings } from '@/components/dashboard/job-listings';
 import type { ParsedResume } from '@/types';
 import { Separator } from '@/components/ui/separator';
-import { AlertCircle, FileText, SearchX, UserCog } from 'lucide-react'; // Added UserCog
+import { AlertCircle, FileText, SearchX, UserCog } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getUserResume } from '@/actions/resume';
-import { logResumeView } from '@/actions/history';
-import { JOBMATCHER_USER_ID_KEY, MY_PROFILE_RESUME_ID, MY_PROFILE_RESUME_TITLE } from '@/lib/constants';
+// import { logResumeView } from '@/actions/history'; // Removed as history logs uploads now
+import { JOBMATCHER_USER_ID_KEY } from '@/lib/constants'; // Removed MY_PROFILE_RESUME_ID, MY_PROFILE_RESUME_TITLE
 
 export default function JobMatchesPage() {
   const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
   const [isLoadingResume, setIsLoadingResume] = useState(true);
   const [jobSearchTrigger, setJobSearchTrigger] = useState(0);
   const [errorLoadingResume, setErrorLoadingResume] = useState<string | null>(null);
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function JobMatchesPage() {
       return;
     }
 
-    const loadResumeAndLogView = async () => {
+    const loadResume = async () => {
       setIsLoadingResume(true);
       setErrorLoadingResume(null);
       try {
@@ -44,8 +44,7 @@ export default function JobMatchesPage() {
             if (result.resume && Array.isArray(result.resume.skills) && Array.isArray(result.resume.experience) && Array.isArray(result.resume.education)) {
                 setParsedResume(result.resume);
                 setJobSearchTrigger(prev => prev + 1);
-                // Log the view after successfully loading and setting the resume
-                await logResumeView(userId, MY_PROFILE_RESUME_ID, MY_PROFILE_RESUME_TITLE);
+                // Removed: await logResumeView(userId, MY_PROFILE_RESUME_ID, MY_PROFILE_RESUME_TITLE);
             } else {
                 console.warn("Invalid resume data structure from DB.");
                 setErrorLoadingResume("The resume data from the server is not in the expected format. Try uploading again.");
@@ -68,9 +67,9 @@ export default function JobMatchesPage() {
       }
     };
 
-    loadResumeAndLogView();
+    loadResume();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on mount
+  }, []);
 
   if (isLoadingResume) {
     return (

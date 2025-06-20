@@ -11,7 +11,7 @@ import { parseResume, type ParseResumeOutput } from '@/ai/flows/resume-parsing';
 import { Loader2 } from 'lucide-react';
 
 interface ResumeUploadFormProps {
-  onParsingStart: () => void;
+  onParsingStart: (fileName: string) => void; // Pass filename
   onParsingComplete: (data: ParseResumeOutput) => void;
   onParsingError: (error: string) => void;
 }
@@ -41,7 +41,7 @@ export function ResumeUploadForm({
     }
 
     setIsProcessing(true);
-    onParsingStart();
+    onParsingStart(file.name); // Pass file.name
 
     try {
       const reader = new FileReader();
@@ -66,7 +66,7 @@ export function ResumeUploadForm({
           onParsingError(errorMsg);
           toast({
             title: 'Parsing Error',
-            description: errorMsg, // Use the potentially more specific error message
+            description: errorMsg,
             variant: 'destructive',
           });
         } finally {
@@ -96,14 +96,9 @@ export function ResumeUploadForm({
   };
 
   return (
-    <Card className="w-full shadow-lg">
-      <CardHeader>
-        <CardTitle className="text-2xl">Upload Your Resume</CardTitle>
-        <CardDescription>
-          Let our AI analyze your resume to find the best job matches for you. Supports PDF, DOC, DOCX.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card className="w-full shadow-lg border-0">
+      {/* Removed CardHeader and CardDescription as they are in the parent page */}
+      <CardContent className="p-0"> {/* Adjust padding if needed */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <FileInput 
             onFileChange={handleFileChange} 
