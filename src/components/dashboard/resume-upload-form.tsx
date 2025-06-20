@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ChangeEvent } from 'react';
@@ -56,12 +57,16 @@ export function ResumeUploadForm({
             variant: 'default',
             className: 'bg-accent text-accent-foreground'
           });
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error parsing resume:', error);
-          onParsingError('Failed to parse resume. Please try again.');
+          let errorMsg = 'Failed to parse resume. Please try again.';
+          if (error.message && (error.message.includes('429') || error.message.includes('QuotaFailure') || error.message.includes('rate limit'))) {
+            errorMsg = 'The AI resume parsing service has reached its free tier usage limit (Error 429: Too Many Requests). Please wait a few minutes for the quota to reset, or check your Google Cloud project for billing details. Ensure your file is a valid PDF/DOCX.';
+          }
+          onParsingError(errorMsg);
           toast({
             title: 'Parsing Error',
-            description: 'There was an error parsing your resume. Please ensure it is a valid PDF/DOCX file.',
+            description: errorMsg, // Use the potentially more specific error message
             variant: 'destructive',
           });
         } finally {

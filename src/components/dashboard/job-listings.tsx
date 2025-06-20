@@ -80,7 +80,7 @@ export function JobListings({ parsedResumeData, triggerSearch }: JobListingsProp
       console.error('Error fetching or matching jobs:', e);
       let errorMessage = 'Failed to load and match job listings. Please try again.';
       if (e.message && (e.message.includes('429') || e.message.includes('QuotaFailure') || e.message.includes('rate limit'))) {
-        errorMessage = 'Could not fetch all job matches due to API rate limits. Please wait a few minutes and try refreshing the page or your matches.';
+        errorMessage = 'The AI job matching service has reached its free tier usage limit (Error 429: Too Many Requests). Please wait a few minutes for the quota to reset, or check your Google Cloud project for billing details and quota information. Some matches may not be displayed.';
       }
       setError(errorMessage);
     } finally {
@@ -134,7 +134,7 @@ export function JobListings({ parsedResumeData, triggerSearch }: JobListingsProp
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>{error} 
-          {!(error.includes('rate limit') || error.includes('QuotaFailure')) && ( // Only show "Try again" for non-rate limit errors
+          {!(error.includes('rate limit') || error.includes('QuotaFailure') || error.includes('429')) && ( // Only show "Try again" for non-rate limit errors
             <Button variant="link" onClick={fetchAndMatchJobs} className="p-0 h-auto ml-1">Try again</Button>
           )}
         </AlertDescription>
@@ -165,4 +165,3 @@ export function JobListings({ parsedResumeData, triggerSearch }: JobListingsProp
     </div>
   );
 }
-
