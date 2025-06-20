@@ -38,3 +38,5 @@ Thumbs.db
 # Optional: if using testing libraries
 coverage/
 node_modules/
+node_modules/node_modules/
+.next/
