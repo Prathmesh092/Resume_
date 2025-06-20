@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -10,10 +11,11 @@ interface FileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
   onFileChange: (file: File | null) => void;
   label?: string;
   accept?: string;
+  displayAcceptText?: string;
 }
 
 const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
-  ({ className, onFileChange, label = "Upload Resume", accept = ".pdf,.doc,.docx", ...props }, ref) => {
+  ({ className, onFileChange, label = "Upload File", accept = ".pdf,.doc,.docx,.mp4,.mov,.webm", displayAcceptText = "PDF, DOCX, MP4, MOV, WEBM (MAX 20MB)", ...props }, ref) => {
     const internalRef = React.useRef<HTMLInputElement>(null);
     const [fileName, setFileName] = React.useState<string | null>(null);
     const [isDragging, setIsDragging] = React.useState(false);
@@ -88,7 +90,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
             <span className="font-semibold">Click to upload</span> or drag and drop
           </p>
           <p className="text-xs text-muted-foreground">
-            {accept.split(',').map(ext => ext.toUpperCase().replace('.', '')).join(', ')} (MAX. 5MB)
+            {displayAcceptText}
           </p>
           <Input
             type="file"

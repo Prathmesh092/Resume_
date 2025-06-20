@@ -16,6 +16,9 @@ interface ResumeUploadFormProps {
   onParsingError: (error: string) => void;
 }
 
+const acceptedFileTypes = ".pdf,.doc,.docx,.mp4,.mov,.webm";
+const displayedFileTypes = "PDF, DOCX, MP4, MOV, WEBM (MAX 20MB)";
+
 export function ResumeUploadForm({ 
   onParsingStart, 
   onParsingComplete,
@@ -61,7 +64,9 @@ export function ResumeUploadForm({
           console.error('Error parsing resume:', error);
           let errorMsg = 'Failed to parse resume. Please try again.';
           if (error.message && (error.message.includes('429') || error.message.includes('QuotaFailure') || error.message.includes('rate limit'))) {
-            errorMsg = 'The AI resume parsing service has reached its free tier usage limit (Error 429: Too Many Requests). Please wait a few minutes for the quota to reset, or check your Google Cloud project for billing details. Ensure your file is a valid PDF/DOCX.';
+            errorMsg = 'The AI resume parsing service has reached its free tier usage limit (Error 429: Too Many Requests). Please wait a few minutes for the quota to reset, or check your Google Cloud project for billing details. Ensure your file is a valid PDF/DOCX/Video file.';
+          } else if (file.type.startsWith('video/')) {
+            errorMsg = 'Parsing video resumes is experimental and may not yield accurate results. Consider using a text-based resume for better accuracy or ensuring clear audio/on-screen text in your video.';
           }
           onParsingError(errorMsg);
           toast({
@@ -102,7 +107,8 @@ export function ResumeUploadForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           <FileInput 
             onFileChange={handleFileChange} 
-            accept=".pdf,.doc,.docx" 
+            accept={acceptedFileTypes}
+            displayAcceptText={displayedFileTypes}
             aria-label="Resume upload"
           />
           <Button type="submit" className="w-full" disabled={isProcessing || !file}>
